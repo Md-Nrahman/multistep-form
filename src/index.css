@@ -1,13 +1,210 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* height: 100vh; */
+  margin: 0 auto;
+  max-width: 800px;
+  flex: 1;
+  width: 100%;
+}
+
+.doubleBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0 auto;
+  max-width: 80%;
+}
+
+@media screen and (max-width: 800px) {
+  .doubleBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0 auto;
+    max-width: 80%;
+  }
+}
+
+.fInput {
+  height: 2.5rem;
+  width: 100%;
+  border-radius: 6px;
+  font-size: medium;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  margin: 8px 0;
+  border-color: currentColor;
+}
+
+.fWidth {
+  width: 100%;
+  margin: 8px 0;
+}
+
+.label {
+  margin: 2px 0;
+  text-align: left;
+}
+
+.error {
+  margin: 2px 0;
+  text-align: left;
+  color: red;
+}
+
+.button {
+  height: 2rem;
+  width: 100%;
+  border-radius: 6px;
+  font-size: medium;
+  padding: 0 1rem;
+  margin: 4px 0;
+  background-color: #f1f1f1;
+  color: black;
+  border: none;
+  cursor: pointer;
+}
+
+.nextButton:hover {
+  background-color: #4caf50;
+  color: white;
+}
+
+.backButton:hover {
+  background-color: black;
+  color: white;
+}
+
+.form,
+.utilities {
+  width: 90%;
+  margin: 0 auto;
+  max-width: 800px;
+}
+
+progress {
+  width: 400px;
+  height: 14px;
+  margin: 50px auto;
+  display: block;
+  /* Important Thing */
+  -webkit-appearance: none;
+  border: none;
+}
+
+/* All good till now. Now we'll style the background */
+progress::-webkit-progress-bar {
+  background: black;
+  border-radius: 50px;
+  padding: 2px;
+  box-shadow: 0 1px 0px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Now the value part */
+progress::-webkit-progress-value {
+  border-radius: 50px;
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.4);
+  background: -webkit-linear-gradient(
+      45deg,
+      transparent,
+      transparent 33%,
+      rgba(0, 0, 0, 0.1) 33%,
+      rgba(0, 0, 0, 0.1) 66%,
+      transparent 66%
+    ),
+    -webkit-linear-gradient(top, rgba(255, 255, 255, 0.25), rgba(0, 0, 0, 0.2)),
+    -webkit-linear-gradient(left, #39cf78, #0bd390);
+
+  /* Looks great, now animating it */
+  background-size: 25px 14px, 100% 100%, 100% 100%;
+  -webkit-animation: move 5s linear 0 infinite;
+}
+
+/* That's it! Now let's try creating a new stripe pattern and animate it using animation and keyframes properties  */
+
+@-webkit-keyframes move {
+  0% {
+    background-position: 0px 0px, 0 0, 0 0;
+  }
+  100% {
+    background-position: -100px 0px, 0 0, 0 0;
+  }
+}
+
+.wrapper-progressBar {
+  width: 100%;
+}
+
+.progressBar {
+}
+
+.progressBar li {
+  list-style-type: none;
+  float: left;
+  width: 25%;
+  position: relative;
+  text-align: center;
+}
+
+.progressBar li:before {
+  content: " ";
+  line-height: 30px;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #ddd;
+  display: block;
+  text-align: center;
+  margin: 0 auto 10px;
+  background-color: white;
+}
+
+.progressBar li:after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background-color: #ddd;
+  top: 15px;
+  left: -50%;
+  z-index: -1;
+}
+
+.progressBar li:first-child:after {
+  content: none;
+}
+
+.progressBar li.active {
+  color: dodgerblue;
+}
+
+.progressBar li.active:before {
+  border-color: rgb(28, 182, 28);
+  background-color: rgb(28, 182, 28);
+}
+
+.progressBar li.active + li:after {
+  background-color: rgb(28, 182, 28);
+}
+
+.stepper {
+  height: 80px;
 }
