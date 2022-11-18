@@ -12,7 +12,6 @@ function Input({
   reset,
   resetStatus = false,
 }) {
-  console.log(value);
   return (
     <div className="fWidth">
       <h5 className="label">{label}</h5>

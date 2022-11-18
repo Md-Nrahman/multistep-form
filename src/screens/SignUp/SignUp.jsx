@@ -6,6 +6,7 @@ import ErrorBox from "../../common/ErrorBox";
 import Input from "../../common/Input";
 import ProgressBar from "../../common/ProgressBar";
 import Stepper from "../../common/Stepper";
+import Modal from "../../components/Modal";
 import SuccessMessage from "../../components/SuccessMessage";
 import db, { storage } from "../../firebaseConfig";
 
@@ -38,6 +39,10 @@ function SignUp() {
 
   const [errorStatus, setErrorStatus] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [stepCount, setStepCount] = useState(1);
+  const [progress, setProgress] = useState(0);
+  const [modalStatus, setModalStatus] = useState(false);
+
   const uploadFile = (e, key) => {
     const file = e.target.files[0];
 
@@ -51,13 +56,18 @@ function SignUp() {
     uploadTask.on(
       "state_changed",
       (snapshot) => {
-        const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-        console.log(progress);
+        setModalStatus(true);
+        const progressPercentage = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        setProgress(progressPercentage);
       },
       (error) => {
         alert(error);
+        setModalStatus(false);
+        setProgress(0);
       },
       () => {
+        setModalStatus(false);
+        setProgress(0);
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setFormData({ ...formData, [key]: downloadURL });
         });
@@ -192,8 +202,6 @@ function SignUp() {
     },
   ];
 
-  const [stepCount, setStepCount] = useState(1);
-
   const increaseStepstepCount = () => {
     setStepCount(stepCount + 1);
   };
@@ -236,8 +244,8 @@ function SignUp() {
     <div className="doubleBox">
       <div className="container">
         <div className="utilities">
-          <h2>SIGN UP YOUR USER ACCOUNT</h2>
-          <h5>Please fill all the fields to submit</h5>
+          <h2 className="text-center">SIGN UP YOUR USER ACCOUNT</h2>
+          <h5 className="text-center">Please fill all the fields to submit</h5>
           <Stepper count={stepCount} />
           <ProgressBar count={stepCount} />
           {stepCount === 4 && !submitError && <SuccessMessage />}
@@ -251,6 +259,7 @@ function SignUp() {
                 (item) =>
                   item.step === stepCount && (
                     <Input
+                      key={item.label}
                       label={item?.label}
                       type={item?.type}
                       value={item?.value}
@@ -276,6 +285,7 @@ function SignUp() {
         </form>
       </div>
       {errorStatus && <ErrorBox error={formErrors} />}
+      {modalStatus && <Modal content={progress} />}
     </div>
   );
 }
