@@ -5,15 +5,18 @@ function ErrorBox({ error }) {
   return (
     <div>
       Please fix all the issues and try again.
-      <ul>
+      <ol>
         {Object.keys(error).map((key) => {
-          return (
-            <li>
-              {key} {error[key]}
-            </li>
-          );
+          if (error[key]) {
+            return (
+              <li>
+                <strong>{key}</strong> {error[key]}
+              </li>
+            );
+          }
+          return null;
         })}
-      </ul>
+      </ol>
     </div>
   );
 }

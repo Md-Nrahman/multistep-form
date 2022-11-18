@@ -1,12 +1,16 @@
-import React from "react";
+import { doc, setDoc } from "firebase/firestore/lite";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import React, { useState } from "react";
 import Button from "../../common/Button";
 import ErrorBox from "../../common/ErrorBox";
 import Input from "../../common/Input";
 import ProgressBar from "../../common/ProgressBar";
 import Stepper from "../../common/Stepper";
+import SuccessMessage from "../../components/SuccessMessage";
+import db, { storage } from "../../firebaseConfig";
 
 function SignUp() {
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = useState({
     email: "",
     username: "",
     password: "",
@@ -19,7 +23,7 @@ function SignUp() {
     signatureUrl: "",
   });
 
-  const [formErrors, setFormErrors] = React.useState({
+  const [formErrors, setFormErrors] = useState({
     email: "",
     username: "",
     password: "",
@@ -32,7 +36,34 @@ function SignUp() {
     signatureUrl: "",
   });
 
-  const [errorStatus, setErrorStatus] = React.useState(false);
+  const [errorStatus, setErrorStatus] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const uploadFile = (e, key) => {
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    if (file.type.split("/")[0] !== "image") return;
+
+    const storageRef = ref(storage, `files/${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        console.log(progress);
+      },
+      (error) => {
+        alert(error);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setFormData({ ...formData, [key]: downloadURL });
+        });
+      }
+    );
+  };
 
   const stepWiseFormStructure = [
     {
@@ -101,48 +132,67 @@ function SignUp() {
       placeholder: "Last Name",
       value: formData.lastName,
       error: formErrors.lastName,
-      onChange: (e) => setFormData({ ...formData, lastName: e.target.value }),
+      onChange: (e) => {
+        setFormData({ ...formData, lastName: e.target.value });
+        setFormErrors({ ...formErrors, lastName: "" });
+      },
       step: 2,
     },
     {
       label: "Contact No",
-      type: "text",
+      type: "number",
       placeholder: "Contact No",
       value: formData.contactNo,
       error: formErrors.contactNo,
-      onChange: (e) => setFormData({ ...formData, contactNo: e.target.value }),
+      onChange: (e) => {
+        setFormData({ ...formData, contactNo: e.target.value });
+        setFormErrors({ ...formErrors, contactNo: "" });
+      },
       step: 2,
     },
     {
       label: "Alternate Contact No",
-      type: "text",
+      type: "number",
       placeholder: "Alternate Contact No",
       value: formData.alternateContactNo,
       error: formErrors.alternateContactNo,
-      onChange: (e) => setFormData({ ...formData, alternateContactNo: e.target.value }),
+      onChange: (e) => {
+        setFormData({ ...formData, alternateContactNo: e.target.value });
+        setFormErrors({ ...formErrors, alternateContactNo: "" });
+      },
       step: 2,
     },
     {
       label: "Photo Url",
-      type: "file",
+      type: formData.photoUrl ? "text" : "file",
       placeholder: "Photo Url",
       value: formData.photoUrl,
       error: formErrors.photoUrl,
-      onChange: (e) => setFormData({ ...formData, photoUrl: e.target.value }),
+      disabled: !!formData.photoUrl,
+      onChange: (e) => {
+        uploadFile(e, "photoUrl");
+      },
+      reset: () => setFormData({ ...formData, photoUrl: "" }),
       step: 3,
+      resetStatus: true,
     },
     {
       label: "Signature Url",
-      type: "file",
+      type: formData.signatureUrl ? "text" : "file",
       placeholder: "Signature Url",
       value: formData.signatureUrl,
       error: formErrors.signatureUrl,
-      onChange: (e) => setFormData({ ...formData, signatureUrl: e.target.value }),
+      disabled: !!formData.signatureUrl,
+      onChange: (e) => {
+        uploadFile(e, "signatureUrl");
+      },
+      reset: () => setFormData({ ...formData, signatureUrl: "" }),
       step: 3,
+      resetStatus: true,
     },
   ];
 
-  const [stepCount, setStepCount] = React.useState(1);
+  const [stepCount, setStepCount] = useState(1);
 
   const increaseStepstepCount = () => {
     setStepCount(stepCount + 1);
@@ -164,9 +214,21 @@ function SignUp() {
     return Object.keys(errors).length === 0;
   };
 
-  const submitForm = () => {
+  const submitForm = async () => {
     if (validateFormData()) {
-      setStepCount(stepCount + 1);
+      if (formData.password === formData.confirmPassword) {
+        try {
+          await setDoc(doc(db, "app", "users"), formData);
+          setSubmitError("");
+          setStepCount(stepCount + 1);
+          setErrorStatus(false);
+        } catch (err) {
+          setSubmitError(err.message);
+        }
+      } else {
+        setFormErrors({ ...formErrors, confirmPassword: "Password and Confirm Password should be same" });
+        setErrorStatus(true);
+      }
     }
   };
 
@@ -178,6 +240,8 @@ function SignUp() {
           <h5>Please fill all the fields to submit</h5>
           <Stepper count={stepCount} />
           <ProgressBar count={stepCount} />
+          {stepCount === 4 && !submitError && <SuccessMessage />}
+          {submitError && <h5>There was an error submitting the form</h5>}
         </div>
 
         <form className="form" onSubmit={submitForm}>
@@ -193,6 +257,9 @@ function SignUp() {
                       placeholder={item?.placeholder}
                       onChange={item?.onChange}
                       error={item?.error}
+                      disabled={item?.disabled}
+                      reset={item?.reset}
+                      resetStatus={item?.resetStatus}
                     />
                   )
               )}

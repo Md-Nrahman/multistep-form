@@ -3,7 +3,7 @@ import React from "react";
 function SuccessMessage() {
   return (
     <div>
-      <p>You have successfully signed up</p>
+      <p>You have successfully signed up.</p>
     </div>
   );
 }

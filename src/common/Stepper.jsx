@@ -1,3 +1,4 @@
+import { PropTypes } from "prop-types";
 import React from "react";
 
 function Stepper({ count }) {
@@ -14,3 +15,11 @@ function Stepper({ count }) {
 }
 
 export default Stepper;
+
+Stepper.propTypes = {
+  count: PropTypes.number,
+};
+
+Stepper.defaultProps = {
+  count: 0,
+};
