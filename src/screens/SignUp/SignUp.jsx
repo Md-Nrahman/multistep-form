@@ -216,8 +216,22 @@ function SignUp() {
   };
 
   const submitForm = async () => {
+    const validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    let emailStatus;
+    if (formData.email.match(validRegex)) {
+      emailStatus = true;
+    }
+
     if (validateFormData()) {
-      if (formData.password === formData.confirmPassword) {
+      if (formData.password !== formData.confirmPassword || !emailStatus) {
+        setFormErrors({
+          ...formErrors,
+          confirmPassword:
+            formData.password !== formData.confirmPassword ? "Password and Confirm Password should be same" : "",
+          email: formData.email.match(validRegex) ? "" : "Email is not valid",
+        });
+        setErrorStatus(true);
+      } else {
         try {
           await addDoc(collection(db, "app"), formData);
           setSubmitError("");
@@ -226,9 +240,6 @@ function SignUp() {
         } catch (err) {
           setSubmitError(err.message);
         }
-      } else {
-        setFormErrors({ ...formErrors, confirmPassword: "Password and Confirm Password should be same" });
-        setErrorStatus(true);
       }
     }
   };

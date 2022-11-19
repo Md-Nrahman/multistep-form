@@ -4,8 +4,10 @@ import db from "../../firebaseConfig";
 
 function Users() {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchData = async () => {
+    setLoading(true);
     const colRef = collection(db, "app");
     const docsSnap = await getDocs(colRef);
     const data = [];
@@ -15,11 +17,16 @@ function Users() {
       });
     }
     setUsers(data);
+    setLoading(false);
   };
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="container">
