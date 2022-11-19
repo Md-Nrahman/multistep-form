@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 
 function Modal({ content }) {
@@ -22,3 +23,11 @@ function Modal({ content }) {
 }
 
 export default Modal;
+
+Modal.propTypes = {
+  content: PropTypes.string,
+};
+
+Modal.defaultProps = {
+  content: "",
+};

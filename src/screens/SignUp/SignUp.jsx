@@ -1,4 +1,4 @@
-import { doc, setDoc } from "firebase/firestore/lite";
+import { addDoc, collection } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import React, { useState } from "react";
 import Button from "../../common/Button";
@@ -6,9 +6,10 @@ import ErrorBox from "../../common/ErrorBox";
 import Input from "../../common/Input";
 import ProgressBar from "../../common/ProgressBar";
 import Stepper from "../../common/Stepper";
-import Modal from "../../components/Modal";
 import SuccessMessage from "../../components/SuccessMessage";
 import db, { storage } from "../../firebaseConfig";
+import { useCounter } from "../../hooks/useCounter";
+import Modal from "./Modal";
 
 function SignUp() {
   const [formData, setFormData] = useState({
@@ -39,9 +40,9 @@ function SignUp() {
 
   const [errorStatus, setErrorStatus] = useState(false);
   const [submitError, setSubmitError] = useState("");
-  const [stepCount, setStepCount] = useState(1);
   const [progress, setProgress] = useState(0);
   const [modalStatus, setModalStatus] = useState(false);
+  const { counter, increment, decrement } = useCounter();
 
   const uploadFile = (e, key) => {
     const file = e.target.files[0];
@@ -202,14 +203,6 @@ function SignUp() {
     },
   ];
 
-  const increaseStepstepCount = () => {
-    setStepCount(stepCount + 1);
-  };
-
-  const decreaseStepCount = () => {
-    setStepCount(stepCount - 1);
-  };
-
   const validateFormData = () => {
     const errors = {};
     Object.keys(formData).forEach((key) => {
@@ -226,9 +219,9 @@ function SignUp() {
     if (validateFormData()) {
       if (formData.password === formData.confirmPassword) {
         try {
-          await setDoc(doc(db, "app", "users"), formData);
+          await addDoc(collection(db, "app"), formData);
           setSubmitError("");
-          setStepCount(stepCount + 1);
+          increment();
           setErrorStatus(false);
         } catch (err) {
           setSubmitError(err.message);
@@ -246,18 +239,18 @@ function SignUp() {
         <div className="utilities">
           <h2 className="text-center">SIGN UP YOUR USER ACCOUNT</h2>
           <h5 className="text-center">Please fill all the fields to submit</h5>
-          <Stepper count={stepCount} />
-          <ProgressBar count={stepCount} />
-          {stepCount === 4 && !submitError && <SuccessMessage />}
+          <Stepper count={counter} />
+          <ProgressBar count={counter} />
+          {counter === 4 && !submitError && <SuccessMessage />}
           {submitError && <h5>There was an error submitting the form</h5>}
         </div>
 
         <form className="form" onSubmit={submitForm}>
-          {stepCount < 4 && (
+          {counter < 4 && (
             <>
               {stepWiseFormStructure.map(
                 (item) =>
-                  item.step === stepCount && (
+                  item.step === counter && (
                     <Input
                       key={item.label}
                       label={item?.label}
@@ -273,15 +266,13 @@ function SignUp() {
                   )
               )}
               <Button
-                title={stepCount === 3 ? "Submit" : "Next"}
+                title={counter === 3 ? "Submit" : "Next"}
                 className="nextButton"
-                onClick={stepCount < 3 ? increaseStepstepCount : submitForm}
+                onClick={counter < 3 ? increment : submitForm}
               />
             </>
           )}
-          {stepCount > 1 && stepCount < 4 && (
-            <Button title="Previous" className="backButton" onClick={decreaseStepCount} />
-          )}
+          {counter > 1 && counter < 4 && <Button title="Previous" className="backButton" onClick={decrement} />}
         </form>
       </div>
       {errorStatus && <ErrorBox error={formErrors} />}

@@ -300,3 +300,43 @@ ol li {
 .text-center {
   text-align: center;
 }
+
+table {
+  width: 100%;
+  max-width: 960px;
+  margin: 10px auto;
+
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #b2beb5;
+}
+
+th,
+td {
+  padding: 0.75rem;
+  font-size: 0.9375rem;
+}
+
+th {
+  font-weight: 700;
+  text-align: left;
+  color: #272838;
+  border-bottom: 2px solid #b2beb5;
+
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+}
+
+td {
+  color: #7e7f9a;
+}
+
+.table-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}

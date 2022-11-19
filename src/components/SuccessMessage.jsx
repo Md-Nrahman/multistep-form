@@ -4,8 +4,10 @@ import { Link } from "react-router-dom";
 function SuccessMessage() {
   return (
     <div>
-      <p>You have successfully signed up.</p>
-      <Link to="users">Click here to go to Users Tab</Link>
+      <p className="text-center">You have successfully signed up.</p>
+      <p className="text-center">
+        <Link to="users">Click here to go to Users Tab</Link>
+      </p>
     </div>
   );
 }
